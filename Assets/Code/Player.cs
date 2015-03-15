@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 
 public class Player : MonoBehaviour {
 
@@ -8,6 +7,7 @@ public class Player : MonoBehaviour {
     private bool _canInput;
     private float _inputHoldTime;
     private float _cooldownTimer;
+    private int _numberOfCoins;
 
     /* References */
     private Rigidbody _rb;
@@ -24,14 +24,16 @@ public class Player : MonoBehaviour {
         _inputHoldTime = _cooldownTimer = 0;
         _rb = GetComponent<Rigidbody>();
         _rb.velocity = Vector3.zero;
+        _numberOfCoins = 0;
     }
 
 	// Update is called once per frame
 	void Update () {
-//#if UNITY_EDITOR
+#if UNITY_EDITOR
 	    HandleKeyboardInput();
-//#endif
-//#if UNITY_ANDROID
+#endif
+
+        //#if UNITY_ANDROID
         HandleTouchInput();
 //#endif
 
@@ -45,7 +47,7 @@ public class Player : MonoBehaviour {
 	    }
 	}
 
-//#if UNITY_EDITOR
+#if UNITY_EDITOR
     private void HandleKeyboardInput()
     {
         if (Input.GetKey(KeyCode.LeftArrow))
@@ -70,7 +72,7 @@ public class Player : MonoBehaviour {
             _canInput = false;
         }
     }
-//#endif
+#endif
 
 //#if UNITY_ANDROID
     private void HandleTouchInput()
@@ -78,4 +80,9 @@ public class Player : MonoBehaviour {
         
     }
 //#endif
+
+    public void CollectCoin()
+    {
+        _numberOfCoins++;
+    }
 }
