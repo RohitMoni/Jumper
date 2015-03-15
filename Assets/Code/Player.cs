@@ -7,19 +7,16 @@ public class Player : MonoBehaviour {
     /* Properties */
     private bool _canInput;
     private bool _isTouching;
-    private float _distToGround;
     private float _inputHoldTime;
     private float _cooldownTimer;
     private int _numberOfCoins;
 
     /* References */
     private Rigidbody _rb;
-    private Slider _jumpSliderLeft;
-    private Slider _jumpSliderRight;
 
     /* Constants */
     private const float MinimumInputHoldTime = 0.1f;
-    private const float MaximumInputHoldTime = 0.75f;
+    public const float MaximumInputHoldTime = 0.75f;
     private const float JumpCooldown = 1f;
     private const float JumpCoefficient = 4.00f;
 
@@ -31,16 +28,11 @@ public class Player : MonoBehaviour {
     {
         _canInput = true;
         _isTouching = false;
-        _distToGround = GetComponent<Collider>().bounds.extents.y;
         
         _inputHoldTime = _cooldownTimer = 0;
         _rb = GetComponent<Rigidbody>();
         _rb.velocity = Vector3.zero;
         _numberOfCoins = 0;
-
-        _jumpSliderLeft = GameObject.Find("JumpSliderLeft").GetComponent<Slider>();
-        _jumpSliderRight = GameObject.Find("JumpSliderRight").GetComponent<Slider>();
-
     }
 
 	// Update is called once per frame
@@ -58,7 +50,6 @@ public class Player : MonoBehaviour {
 
 	    if (_cooldownTimer >= JumpCooldown && IsGrounded())
 	    {
-            GameManager.Debug(_cooldownTimer.ToString());
 	        _canInput = true;
             _cooldownTimer = 0;
 	    }
@@ -96,7 +87,7 @@ public class Player : MonoBehaviour {
             _inputHoldTime = 0;
         }
 
-        UpdateJumpSliders();
+        GameManager.UpdateJumpSliders(_inputHoldTime);
     }
 #endif
 
@@ -133,12 +124,7 @@ public class Player : MonoBehaviour {
             _inputHoldTime = 0;
         }
 
-        UpdateJumpSliders();
-    }
-
-    private void UpdateJumpSliders()
-    {
-        _jumpSliderLeft.value = _jumpSliderRight.value = 100 - (Math.Abs(_inputHoldTime)/MaximumInputHoldTime * 100);
+        GameManager.UpdateJumpSliders(_inputHoldTime);
     }
 
     private void SetRbVelocity()
@@ -153,6 +139,7 @@ public class Player : MonoBehaviour {
     public void CollectCoin()
     {
         _numberOfCoins++;
+        GameManager.UpdateCoinText(_numberOfCoins);
     }
 
     private bool IsGrounded()
