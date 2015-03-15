@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Code;
+using UnityEngine;
 
 public class Coin : MonoBehaviour {
 
@@ -8,6 +9,7 @@ public class Coin : MonoBehaviour {
         if (other.tag == "Player")
         {
             other.gameObject.GetComponent<Player>().CollectCoin();
+            CoinManager.CollectCoin(gameObject);
             Debug.Log("Coin collected!");
         }
     }
