@@ -19,6 +19,9 @@ public class Player : MonoBehaviour {
     private const float MaximumInputHoldTime = 0.5f;
     private const float JumpCooldown = 1f;
 
+    private const float PlayerLeftBoundX = -15;
+    private const float PlayerRightBoundX = 15;
+
 	// Use this for initialization
     void Awake()
     {
@@ -35,11 +38,14 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
+        // Handle input
 #if UNITY_EDITOR
 	    HandleKeyboardInput();
 #endif
         HandleTouchInput();
 
+        // Updating cooldown timer
         if (!_canInput)
 	        _cooldownTimer += Time.smoothDeltaTime;
 
@@ -49,6 +55,13 @@ public class Player : MonoBehaviour {
 	        _canInput = true;
             _cooldownTimer = 0;
 	    }
+
+        // Limiting player's X coord
+	    var position = transform.position;
+	    position.x = Math.Max(position.x, PlayerLeftBoundX);
+	    position.x = Math.Min(position.x, PlayerRightBoundX);
+
+	    transform.position = position;
 	}
 
 #if UNITY_EDITOR
