@@ -43,6 +43,11 @@ namespace Assets.Code
             ActiveCoins.Add(coin);
         }
 
+        public static void CreateCoinBurstAt(Vector3 position)
+        {
+            
+        }
+
         public static int CountCoins()
         {
             return UnusedCoins.Count + ActiveCoins.Count;

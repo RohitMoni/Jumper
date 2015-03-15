@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     private static Text _coinText;
 
     /* Constants */
+    public const float LeftBound = -15;
+    public const float RightBound = 15;
+    public const float BottomBound = 0;
+    public const float TopBound = 15;
 
 	// Use this for initialization
 	void Start () {
@@ -37,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateCoins()
     {
-        CoinManager.CreateCoinAt(new Vector3(2, 4, 0));
+        CoinManager.CreateCoinAt(new Vector3(2, 3, 0));
     }
 
     public static void Debug(string text)

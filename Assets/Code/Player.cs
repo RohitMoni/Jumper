@@ -20,9 +20,6 @@ public class Player : MonoBehaviour {
     private const float JumpCooldown = 1f;
     private const float JumpCoefficient = 4.00f;
 
-    private const float PlayerLeftBoundX = -15;
-    private const float PlayerRightBoundX = 15;
-
 	// Use this for initialization
     void Awake()
     {
@@ -56,8 +53,9 @@ public class Player : MonoBehaviour {
 
         // Limiting player's X coord
 	    var position = transform.position;
-	    position.x = Math.Max(position.x, PlayerLeftBoundX);
-	    position.x = Math.Min(position.x, PlayerRightBoundX);
+	    position.x = Math.Max(position.x, GameManager.LeftBound);
+	    position.x = Math.Min(position.x, GameManager.RightBound);
+	    position.y = Math.Min(position.y, GameManager.TopBound);
 
 	    transform.position = position;
 	}
