@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
@@ -13,11 +14,14 @@ public class Player : MonoBehaviour {
 
     /* References */
     private Rigidbody _rb;
+    private Slider _jumpSliderLeft;
+    private Slider _jumpSliderRight;
 
     /* Constants */
     private const float MinimumInputHoldTime = 0.1f;
-    private const float MaximumInputHoldTime = 0.5f;
+    private const float MaximumInputHoldTime = 0.75f;
     private const float JumpCooldown = 1f;
+    private const float JumpCoefficient = 4.00f;
 
     private const float PlayerLeftBoundX = -15;
     private const float PlayerRightBoundX = 15;
@@ -33,6 +37,9 @@ public class Player : MonoBehaviour {
         _rb = GetComponent<Rigidbody>();
         _rb.velocity = Vector3.zero;
         _numberOfCoins = 0;
+
+        _jumpSliderLeft = GameObject.Find("JumpSliderLeft").GetComponent<Slider>();
+        _jumpSliderRight = GameObject.Find("JumpSliderRight").GetComponent<Slider>();
 
     }
 
@@ -81,10 +88,15 @@ public class Player : MonoBehaviour {
             _inputHoldTime = Math.Max(_inputHoldTime, MinimumInputHoldTime);
             _inputHoldTime = Math.Min(_inputHoldTime, MaximumInputHoldTime);
         }
-        else if (_canInput && (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow)))
+        else if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
         {
-            SetRbVelocity();
+            if (_canInput)
+                SetRbVelocity();
+
+            _inputHoldTime = 0;
         }
+
+        UpdateJumpSliders();
     }
 #endif
 
@@ -97,10 +109,10 @@ public class Player : MonoBehaviour {
 
             if (touch.rawPosition.x <= Screen.width / 2f)
             {
-            _inputHoldTime -= Time.smoothDeltaTime;
+                _inputHoldTime -= Time.smoothDeltaTime;
 
-            _inputHoldTime = Math.Max(_inputHoldTime, -MaximumInputHoldTime);
-            _inputHoldTime = Math.Min(_inputHoldTime, -MinimumInputHoldTime);
+                _inputHoldTime = Math.Max(_inputHoldTime, -MaximumInputHoldTime);
+                _inputHoldTime = Math.Min(_inputHoldTime, -MinimumInputHoldTime);
             }
             else
             {
@@ -117,13 +129,22 @@ public class Player : MonoBehaviour {
 
             if (_canInput)
                 SetRbVelocity();
+
+            _inputHoldTime = 0;
         }
+
+        UpdateJumpSliders();
+    }
+
+    private void UpdateJumpSliders()
+    {
+        _jumpSliderLeft.value = _jumpSliderRight.value = 100 - (Math.Abs(_inputHoldTime)/MaximumInputHoldTime * 100);
     }
 
     private void SetRbVelocity()
     {
         // We add to velocity here
-        _rb.velocity = new Vector3(Mathf.Sign(_inputHoldTime), Math.Abs(_inputHoldTime) * 3, 0) * 5;
+        _rb.velocity = new Vector3(Mathf.Sign(_inputHoldTime), Math.Abs(_inputHoldTime) * JumpCoefficient , 0) * JumpCoefficient;
         _inputHoldTime = 0;
         _cooldownTimer = 0;
         _canInput = false;
@@ -138,6 +159,6 @@ public class Player : MonoBehaviour {
     {
         var _collider = GetComponent<Collider>();
 
-        return Physics.CheckCapsule(_collider.bounds.center,new Vector3(_collider.bounds.center.x,_collider.bounds.min.y-0.1f,_collider.bounds.center.z),0.18f);
+        return Physics.CheckCapsule(_collider.bounds.center,new Vector3(_collider.bounds.center.x,_collider.bounds.min.y,_collider.bounds.center.z),0.1f);
     }
 }
