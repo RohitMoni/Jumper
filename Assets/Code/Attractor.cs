@@ -17,7 +17,7 @@ public class Attractor : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        _parentT.Translate(_velocity);
+        //_parentT.Translate(_velocity);
 	}
 
     void OnTriggerStay (Collider other)
@@ -25,7 +25,8 @@ public class Attractor : MonoBehaviour {
         if (other.tag != "Player")
             return;
 
-        _velocity += (other.transform.position - transform.position).normalized * _attractAccel;
+        _parentT.GetComponent<Rigidbody>().AddForce((other.transform.position - transform.position).normalized * _attractAccel);
+        //_velocity += ;
     }
 
     void OnTriggerExit (Collider other)

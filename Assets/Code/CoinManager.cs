@@ -39,7 +39,7 @@ namespace Assets.Code
                 var velocity = new Vector3(x, y, 0);
 
                 coin.transform.position = position;
-                coin.GetComponent<Coin>().SetVelocity(velocity);
+                //coin.GetComponent<Coin>().SetVelocity(velocity);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Assets.Code
             }
 
             // Call our init function
-            coin.GetComponent<Coin>().Initialize();
+            //coin.GetComponent<Coin>().Initialize();
 
             // add the coin to the active coins list
             ActiveCoins.Add(coin);
