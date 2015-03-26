@@ -14,10 +14,36 @@ namespace Assets.Code
         private static readonly List<GameObject> ActiveCoins = new List<GameObject>(); 
 
         /* References */
+        private static readonly GameObject CoinAnchor = GameObject.Find("CoinAnchor");
+
+        /* Constants */
         private const string CoinPrefabName = "Prefabs/Coin";
+        private const int NumberOfCoinsInBurst = 10;
 
         /* Functions */
         public static void CreateCoinAt(Vector3 position)
+        {
+            var coin = CreateRecycledCoin();
+            coin.transform.position = position;
+        }
+
+        public static void CreateCoinBurstAt(Vector3 position)
+        {
+            for (var i = 0; i < NumberOfCoinsInBurst; i++)
+            {
+                var coin = CreateRecycledCoin();
+
+                var x = UnityEngine.Random.Range(-1f, 1f);
+                var y = UnityEngine.Random.Range(-1f, 1f);
+
+                var velocity = new Vector3(x, y, 0);
+
+                coin.transform.position = position;
+                coin.GetComponent<Coin>().SetVelocity(velocity);
+            }
+        }
+
+        private static GameObject CreateRecycledCoin()
         {
             GameObject coin;
 
@@ -29,23 +55,23 @@ namespace Assets.Code
                 UnusedCoins.RemoveAt(0);
 
                 coin.SetActive(true);
-                coin.transform.position = position;
             }
             // If no unused coins exist, create a new one
             else
             {
                 coin = Object.Instantiate(Resources.Load(CoinPrefabName) as GameObject);
-
-                coin.transform.position = position;
             }
+
+            // Call our init function
+            coin.GetComponent<Coin>().Initialize();
 
             // add the coin to the active coins list
             ActiveCoins.Add(coin);
-        }
 
-        public static void CreateCoinBurstAt(Vector3 position)
-        {
-            
+            // Parent it to the anchor
+            coin.transform.parent = CoinAnchor.transform;
+
+            return coin;
         }
 
         public static int CountCoins()

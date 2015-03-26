@@ -4,14 +4,14 @@ using System.Collections;
 public class Attractor : MonoBehaviour {
 
     private Vector3 _velocity;
-    private float _attractAccel;
 
     private Transform _parentT;
+
+    private const float _attractAccel = 0.01f;
 
 	// Use this for initialization
 	void Start () {
         _velocity = Vector3.zero;
-        _attractAccel = 0.01f;
         _parentT = transform.parent;
 	}
 	
