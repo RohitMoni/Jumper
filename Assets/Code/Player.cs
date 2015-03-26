@@ -36,10 +36,13 @@ public class Player : MonoBehaviour {
 	void Update () {
 
         // Handle input
+        if (_canInput)
+        {
 #if UNITY_EDITOR
-	    HandleKeyboardInput();
+            HandleKeyboardInput();
 #endif
-        HandleTouchInput();
+            HandleTouchInput();
+        }
 
         // Updating cooldown timer
         if (!_canInput)
@@ -79,8 +82,7 @@ public class Player : MonoBehaviour {
         }
         else if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
         {
-            if (_canInput)
-                SetRbVelocity();
+            SetRbVelocity();
 
             _inputHoldTime = 0;
         }
@@ -116,8 +118,7 @@ public class Player : MonoBehaviour {
             // Touch release
             _isTouching = false;
 
-            if (_canInput)
-                SetRbVelocity();
+            SetRbVelocity();
 
             _inputHoldTime = 0;
         }
