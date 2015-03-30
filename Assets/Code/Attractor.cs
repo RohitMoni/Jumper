@@ -7,7 +7,7 @@ public class Attractor : MonoBehaviour {
 
     private Transform _parentT;
 
-    private const float _attractAccel = 0.01f;
+    private const float AttractAccel = 1.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -25,7 +25,7 @@ public class Attractor : MonoBehaviour {
         if (other.tag != "Player")
             return;
 
-        _parentT.GetComponent<Rigidbody>().AddForce((other.transform.position - transform.position).normalized * _attractAccel);
+        _parentT.GetComponent<Rigidbody>().AddForce((other.transform.position - transform.position).normalized * AttractAccel);
         //_velocity += ;
     }
 
