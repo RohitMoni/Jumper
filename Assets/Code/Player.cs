@@ -17,8 +17,9 @@ public class Player : MonoBehaviour {
     /* Constants */
     private const float MinimumInputHoldTime = 0.1f;
     public const float MaximumInputHoldTime = 0.75f;
-    private const float JumpCooldown = 1f;
+    private const float JumpCooldown = 0f;
     private const float JumpCoefficient = 4.00f;
+    private const float DistanceToGround = 0.5f;
 
 	// Use this for initialization
     void Awake()
@@ -143,8 +144,6 @@ public class Player : MonoBehaviour {
 
     private bool IsGrounded()
     {
-        var _collider = GetComponent<Collider>();
-
-        return Physics.CheckCapsule(_collider.bounds.center,new Vector3(_collider.bounds.center.x,_collider.bounds.min.y,_collider.bounds.center.z),0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, DistanceToGround + 0.1f);
     }
 }
