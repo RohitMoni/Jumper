@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Mime;
 using Assets.Code;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class GameManager : MonoBehaviour
     /* Properties */
 
     /* References */
+    private NetworkManager _networkManager;
+
     private static Text _debugText;
     private static Slider _jumpSliderLeft;
     private static Slider _jumpSliderRight;
@@ -22,7 +25,10 @@ public class GameManager : MonoBehaviour
     public const float TopBound = 15;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
+	    _networkManager = GetComponent<NetworkManager>();
+
 	    CreateCoins();
 	}
 
@@ -39,7 +45,7 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
 	    if (Input.GetKeyUp(KeyCode.Tab))
 	    {
-            CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
+            _networkManager.CreateNewPlayer();
 	    }
 #endif
 	}
