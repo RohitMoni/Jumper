@@ -36,12 +36,17 @@ public class GameManager : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
-	
+#if UNITY_EDITOR
+	    if (Input.GetKeyUp(KeyCode.Tab))
+	    {
+            CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
+	    }
+#endif
 	}
 
     private void CreateCoins()
     {
-        CoinManager.CreateCoinAt(new Vector3(2, 3, 0));
+        //CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
     }
 
     public static void Debug(string text)

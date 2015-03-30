@@ -27,19 +27,19 @@ namespace Assets.Code
             coin.transform.position = position;
         }
 
-        public static void CreateCoinBurstAt(Vector3 position)
+        public static void CreateCoinBurstAt(Vector3 position, int numberOfCoins=NumberOfCoinsInBurst)
         {
-            for (var i = 0; i < NumberOfCoinsInBurst; i++)
+            for (var i = 0; i < numberOfCoins; i++)
             {
                 var coin = CreateRecycledCoin();
 
-                var x = UnityEngine.Random.Range(-1f, 1f);
+                var x = UnityEngine.Random.Range(-0.5f, 0.5f);
                 var y = UnityEngine.Random.Range(-1f, 1f);
 
                 var velocity = new Vector3(x, y, 0);
 
-                coin.transform.position = position;
-                //coin.GetComponent<Coin>().SetVelocity(velocity);
+                coin.transform.position = position + velocity;
+                coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
             }
         }
 
