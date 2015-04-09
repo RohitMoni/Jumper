@@ -13,6 +13,7 @@ public class NetworkManager : MonoBehaviour {
     private HostData[] _hostList;
 
     /* References */
+    private MenuManager _menuManager;
 
     /* Constants */
     private const string GameTypeName = "RM_Jumper";
@@ -25,6 +26,7 @@ public class NetworkManager : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+	    _menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
 	}
 	
 	// Update is called once per frame
@@ -49,7 +51,7 @@ public class NetworkManager : MonoBehaviour {
         SpawnPlayer();
     }
 
-    void RefreshHostList()
+    public void RefreshHostList()
     {
         MasterServer.RequestHostList(GameTypeName);
     }
@@ -57,7 +59,10 @@ public class NetworkManager : MonoBehaviour {
     void OnMasterServerEvent(MasterServerEvent msEvent)
     {
         if (msEvent == MasterServerEvent.HostListReceived)
+        {
             _hostList = MasterServer.PollHostList();
+            _menuManager.SetupServerButtonList(_hostList);
+        }
     }
 
     void JoinServer(HostData hostData)
