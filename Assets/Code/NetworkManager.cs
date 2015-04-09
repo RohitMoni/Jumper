@@ -1,53 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Assets.Code;
 using UnityEngine;
 using System.Collections;
 
 public class NetworkManager : MonoBehaviour {
 
+    /* Editor Set */
+    public GameObject PlayerPrefab;
+
     /* Properties */
-    public GameObject NetworkedPlayerPrefab;
-    private List<GameObject> _networkedPlayers;
+    private HostData[] _hostList;
 
     /* References */
-    private Transform _networkedPlayerAnchor;
 
     /* Constants */
-    private readonly Vector3 _startPlayerPosition;
+    private const string GameTypeName = "RM_Jumper";
+    private const string GameName = "Jumper_1";
+    private const int NumberOfPlayers = 4;
+    private const int PortNumber = 25000;
 
     // TEST NETWORK STUFF
-    public string gameName = "Jumper";
-
-    public bool refreshing = false;
-    public HostData[] hostData;
-
-    public bool create = false;
-    public bool joining = false;
-
-    public string serverName = "";
-    public string serverInfo = "";
-    public string serverPass = "";
-
-    public string playerName = "";
-
-    public string clientPass = "";
-
-    public Vector2 scrollPosition = Vector2.zero;   
-    
-
-    NetworkManager()
-    {
-        _startPlayerPosition = new Vector3(0, 3, 0);
-    }
 
 	// Use this for initialization
 	void Start ()
 	{
-	    _networkedPlayerAnchor = GameObject.Find("NetworkedPlayerAnchor").transform;
-        _networkedPlayers = new List<GameObject>();
-
-        // NETWORK STUFF
-	    playerName = "Player Name";
 	}
 	
 	// Update is called once per frame
@@ -55,20 +32,43 @@ public class NetworkManager : MonoBehaviour {
 	    
 	}
 
-    public void CreateNewPlayer()
+    void SpawnPlayer()
     {
-        var obj = Instantiate(NetworkedPlayerPrefab);
-        obj.transform.SetParent(_networkedPlayerAnchor);
-        obj.transform.position = _startPlayerPosition;
-
-        _networkedPlayers.Add(obj);
+        Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0);
     }
 
-    void UpdateAllPlayers()
+    void StartServer()
     {
-        foreach (var player in _networkedPlayers)
-        {
-            
-        }
+        Network.InitializeServer(NumberOfPlayers, PortNumber, !Network.HavePublicAddress());
+        MasterServer.RegisterHost(GameTypeName, GameName);
     }
+
+    void OnServerInitialized()
+    {
+        Debug.Log("Server Initialized");
+        SpawnPlayer();
+    }
+
+    void RefreshHostList()
+    {
+        MasterServer.RequestHostList(GameTypeName);
+    }
+
+    void OnMasterServerEvent(MasterServerEvent msEvent)
+    {
+        if (msEvent == MasterServerEvent.HostListReceived)
+            _hostList = MasterServer.PollHostList();
+    }
+
+    void JoinServer(HostData hostData)
+    {
+        Network.Connect(hostData);
+    }
+
+    void OnConnectedToServer()
+    {
+        Debug.Log("Server Joined");
+        SpawnPlayer();
+    }
+
 }

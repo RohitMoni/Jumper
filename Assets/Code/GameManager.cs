@@ -43,10 +43,10 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update () {
 #if UNITY_EDITOR
-	    if (Input.GetKeyUp(KeyCode.Tab))
-	    {
-            _networkManager.CreateNewPlayer();
-	    }
+        //if (Input.GetKeyUp(KeyCode.Tab))
+        //{
+        //    _networkManager.CreateNewPlayer();
+        //}
 #endif
 	}
 

@@ -20,10 +20,17 @@ namespace Assets.Code
         public const float MaximumInputHoldTime = 0.75f;
         private const float JumpCooldown = 0f;
         private const float JumpMaxTime = 5f;
+        private const float JumpMinTime = 0.2f;
         private const float JumpCoefficient = 4.00f;
-        private const float DistanceToGround = 0.5f;
 
-        // Use this for initialization
+        void Start()
+        {
+            name = "Player";
+            transform.SetParent(GetComponent<NetworkView>().isMine
+                ? GameObject.Find("GameAnchor").transform
+                : GameObject.Find("NetworkedPlayerAnchor").transform);
+        }
+
         void Awake()
         {
             _canInput = true;
@@ -38,24 +45,8 @@ namespace Assets.Code
         // Update is called once per frame
         void Update () {
 
-            // Handle input
-            if (_canInput)
-            {
-#if UNITY_EDITOR
-                HandleKeyboardInput();
-#endif
-                HandleTouchInput();
-            }
-
-            // Updating cooldown timer
-            if (!_canInput)
-                _cooldownTimer += Time.smoothDeltaTime;
-
-            if ((_cooldownTimer >= JumpCooldown && IsGrounded()) || _cooldownTimer > JumpMaxTime)
-            {
-                _canInput = true;
-                _cooldownTimer = 0;
-            }
+            if (GetComponent<NetworkView>().isMine)
+                HandleInput();
 
             // Limiting player's X coord
             var position = transform.position;
@@ -66,7 +57,26 @@ namespace Assets.Code
             transform.position = position;
         }
 
-#if UNITY_EDITOR
+        private void HandleInput()
+        {
+            if (_canInput)
+            {
+                HandleKeyboardInput();
+                HandleTouchInput();
+            }
+            else
+            {
+                // Updating cooldown timer
+                _cooldownTimer += Time.smoothDeltaTime;
+
+                if ((_cooldownTimer > JumpMinTime && IsGrounded()) || _cooldownTimer > JumpMaxTime)
+                {
+                    _canInput = true;
+                    _cooldownTimer = 0;
+                }
+            }
+        }
+
         private void HandleKeyboardInput()
         {
             if (Input.GetKey(KeyCode.LeftArrow))
@@ -92,7 +102,6 @@ namespace Assets.Code
 
             GameManager.UpdateJumpSliders(_inputHoldTime);
         }
-#endif
 
         private void HandleTouchInput()
         {
@@ -146,7 +155,17 @@ namespace Assets.Code
 
         private bool IsGrounded()
         {
-            return Physics.Raycast(transform.position, -Vector3.up, DistanceToGround + 0.1f);
+            var size = transform.localScale.x;
+
+            var leftPoint = transform.position;
+            var rightpoint = leftPoint;
+            leftPoint.x -= size;
+            rightpoint.x += size;
+
+            var leftGrounded = Physics.Raycast(leftPoint, -Vector3.up, size);
+            var rightGrounded = Physics.Raycast(rightpoint, -Vector3.up, size);
+
+            return leftGrounded || rightGrounded;
         }
     }
 }
