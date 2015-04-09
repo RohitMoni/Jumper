@@ -37,7 +37,7 @@ public class NetworkManager : MonoBehaviour {
         Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0);
     }
 
-    void StartServer()
+    public void StartServer()
     {
         Network.InitializeServer(NumberOfPlayers, PortNumber, !Network.HavePublicAddress());
         MasterServer.RegisterHost(GameTypeName, GameName);
