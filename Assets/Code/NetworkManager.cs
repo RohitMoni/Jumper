@@ -65,7 +65,7 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
-    void JoinServer(HostData hostData)
+    public void JoinServer(HostData hostData)
     {
         Network.Connect(hostData);
     }

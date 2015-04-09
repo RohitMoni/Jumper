@@ -46,6 +46,12 @@ public class MenuManager : MonoBehaviour
         _networkManager.StartServer();
     }
 
+    public void JoinGame(HostData data)
+    {
+        _mainMenu.SetActive(false);
+        _networkManager.JoinServer(data);
+    }
+
     public void RefreshServerList()
     {
         _networkManager.RefreshHostList();
@@ -57,12 +63,12 @@ public class MenuManager : MonoBehaviour
 
     public void SetupServerButtonList(HostData[] hostList)
     {
-
         foreach (var item in hostList)
         {
             var serverButton = Instantiate(ServerButton);
             serverButton.transform.SetParent(_contentPanel.transform);
-            serverButton.transform.FindChild("Text").GetComponent<Text>().text = item.gameName;
+            serverButton.GetComponent<ConnectToServerButton>().Initialise(item);
+            //serverButton.GetComponent<Button>().onClick.AddListener();
         }
     }
 }
