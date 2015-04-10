@@ -13,11 +13,11 @@ namespace Assets.Code
         private int _numberOfCoins;
 
         // Networking
-        private float lastSynchronizationTime = 0f;
-        private float syncDelay = 0f;
-        private float syncTime = 0f;
-        private Vector3 syncStartPosition = Vector3.zero;
-        private Vector3 syncEndPosition = Vector3.zero;
+        private float _lastSynchronizationTime = 0f;
+        private float _syncDelay = 0f;
+        private float _syncTime = 0f;
+        private Vector3 _syncStartPosition = Vector3.zero;
+        private Vector3 _syncEndPosition = Vector3.zero;
 
         /* References */
         private Rigidbody _rb;
@@ -33,9 +33,17 @@ namespace Assets.Code
         void Start()
         {
             name = "Player";
-            transform.SetParent(GetComponent<NetworkView>().isMine
-                ? GameObject.Find("GameAnchor").transform
-                : GameObject.Find("NetworkedPlayerAnchor").transform);
+            if (GetComponent<NetworkView>().isMine)
+            {
+                transform.SetParent(GameObject.Find("GameAnchor").transform);
+                var camera = Camera.main;
+                camera.transform.SetParent(transform);
+                camera.transform.position += new Vector3(0, 3f, 0);
+            }
+            else
+            {
+                transform.SetParent(GameObject.Find("NetworkedPlayerAnchor").transform);
+            }
         }
 
         void Awake()
@@ -159,7 +167,8 @@ namespace Assets.Code
         public void CollectCoin()
         {
             _numberOfCoins++;
-            GameManager.UpdateCoinText(_numberOfCoins);
+            if (GetComponent<NetworkView>().isMine)
+                GameManager.UpdateCoinText(_numberOfCoins);
         }
 
         private bool IsGrounded()
@@ -190,19 +199,19 @@ namespace Assets.Code
             {
                 stream.Serialize(ref syncPosition);
 
-                syncTime = 0f;
-                syncDelay = Time.time - lastSynchronizationTime;
-                lastSynchronizationTime = Time.time;
+                _syncTime = 0f;
+                _syncDelay = Time.time - _lastSynchronizationTime;
+                _lastSynchronizationTime = Time.time;
 
-                syncStartPosition = GetComponent<Rigidbody>().position;
-                syncEndPosition = syncPosition;
+                _syncStartPosition = GetComponent<Rigidbody>().position;
+                _syncEndPosition = syncPosition;
             }
         }
 
         void SyncedMovement()
         {
-            syncTime += Time.deltaTime;
-            GetComponent<Rigidbody>().position = Vector3.Lerp(syncStartPosition, syncEndPosition, syncTime / syncDelay);
+            _syncTime += Time.deltaTime;
+            GetComponent<Rigidbody>().position = Vector3.Lerp(_syncStartPosition, _syncEndPosition, _syncTime / _syncDelay);
         }
     }
 }

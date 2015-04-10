@@ -10,8 +10,8 @@ namespace Assets.Code
     static class CoinManager
     {
         /* Properties */
-        private static readonly List<GameObject> UnusedCoins = new List<GameObject>();
-        private static readonly List<GameObject> ActiveCoins = new List<GameObject>(); 
+        public static readonly List<GameObject> UnusedCoins = new List<GameObject>();
+        public static readonly List<GameObject> ActiveCoins = new List<GameObject>(); 
 
         /* References */
         private static readonly GameObject CoinAnchor = GameObject.Find("CoinAnchor");
@@ -59,7 +59,7 @@ namespace Assets.Code
             // If no unused coins exist, create a new one
             else
             {
-                coin = Object.Instantiate(Resources.Load(CoinPrefabName) as GameObject);
+                coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
             }
 
             // Call our init function
@@ -77,13 +77,6 @@ namespace Assets.Code
         public static int CountCoins()
         {
             return UnusedCoins.Count + ActiveCoins.Count;
-        }
-
-        public static void CollectCoin(GameObject coin)
-        {
-            ActiveCoins.Remove(coin);
-            coin.SetActive(false);
-            UnusedCoins.Add(coin);
         }
     }
 }

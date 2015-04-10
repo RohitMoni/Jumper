@@ -21,7 +21,7 @@ public class Collector : MonoBehaviour {
         if (other.tag == "Player")
         {
             other.gameObject.GetComponent<Player>().CollectCoin();
-            CoinManager.CollectCoin(transform.parent.gameObject);
+            transform.parent.gameObject.GetComponent<Coin>().Collect();
             Debug.Log("Coin collected!");
         }
     }

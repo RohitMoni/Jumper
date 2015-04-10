@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using Assets.Code;
 using UnityEngine;
 using System.Collections;
@@ -10,10 +11,13 @@ public class NetworkManager : MonoBehaviour {
     public GameObject PlayerPrefab;
 
     /* Properties */
+    public bool IsHost;
+    public bool IsClient;
     private HostData[] _hostList;
 
     /* References */
     private MenuManager _menuManager;
+    private GameManager _gameManager;
 
     /* Constants */
     private const string GameTypeName = "RM_Jumper";
@@ -21,12 +25,11 @@ public class NetworkManager : MonoBehaviour {
     private const int NumberOfPlayers = 4;
     private const int PortNumber = 25000;
 
-    // TEST NETWORK STUFF
-
-	// Use this for initialization
 	void Start ()
 	{
+	    IsHost = IsClient = false;
 	    _menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+	    _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 	}
 	
 	// Update is called once per frame
@@ -48,6 +51,8 @@ public class NetworkManager : MonoBehaviour {
     void OnServerInitialized()
     {
         Debug.Log("Server Initialized");
+        IsHost = true;
+        _gameManager.StartGame();
         SpawnPlayer();
     }
 
@@ -73,6 +78,8 @@ public class NetworkManager : MonoBehaviour {
     void OnConnectedToServer()
     {
         Debug.Log("Server Joined");
+        IsClient = true;
+        _gameManager.StartGame();
         SpawnPlayer();
     }
 

@@ -9,6 +9,9 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     /* Properties */
+    private bool _gameStarted;
+    private float _timer;
+    private float _coinBurstTimer = 5f;
 
     /* References */
     private NetworkManager _networkManager;
@@ -27,9 +30,8 @@ public class GameManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+	    _gameStarted = false;
 	    _networkManager = GetComponent<NetworkManager>();
-
-	    CreateCoins();
 	}
 
     void Awake()
@@ -41,18 +43,32 @@ public class GameManager : MonoBehaviour
     }
 	
 	// Update is called once per frame
-	void Update () {
-#if UNITY_EDITOR
-        //if (Input.GetKeyUp(KeyCode.Tab))
-        //{
-        //    _networkManager.CreateNewPlayer();
-        //}
-#endif
+	void Update ()
+	{
+	    if (!_gameStarted)
+	        return;
+
+	    _timer += Time.smoothDeltaTime;
+
+	    if (_networkManager.IsHost)
+	    {
+            if (_timer % _coinBurstTimer < 0.02f)
+                CreateCoins();
+	    }
+	    else
+	    {
+	        
+	    }
 	}
+
+    public void StartGame()
+    {
+        _gameStarted = true;
+    }
 
     private void CreateCoins()
     {
-        //CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
+       CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
     }
 
     public static void Debug(string text)
