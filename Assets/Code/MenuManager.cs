@@ -32,6 +32,7 @@ public class MenuManager : MonoBehaviour
     {
         _mainMenu.SetActive(false);
         _findGameMenu.SetActive(true);
+        RefreshServerList();
     }
 
     public void FindGameMenuToMainMenu()
@@ -49,16 +50,17 @@ public class MenuManager : MonoBehaviour
     public void JoinGame(HostData data)
     {
         _mainMenu.SetActive(false);
+        _findGameMenu.SetActive(false);
         _networkManager.JoinServer(data);
     }
 
     public void RefreshServerList()
     {
-        _networkManager.RefreshHostList();
         foreach (Transform button in _contentPanel.transform)
         {
             Destroy(button.gameObject);
         }
+        _networkManager.RefreshHostList();
     }
 
     public void SetupServerButtonList(HostData[] hostList)
@@ -68,7 +70,8 @@ public class MenuManager : MonoBehaviour
             var serverButton = Instantiate(ServerButton);
             serverButton.transform.SetParent(_contentPanel.transform);
             serverButton.GetComponent<ConnectToServerButton>().Initialise(item);
-            //serverButton.GetComponent<Button>().onClick.AddListener();
+            var data = item;
+            serverButton.GetComponent<Button>().onClick.AddListener(() => JoinGame(data));
         }
     }
 }

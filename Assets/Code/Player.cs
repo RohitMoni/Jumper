@@ -12,6 +12,13 @@ namespace Assets.Code
         private float _cooldownTimer;
         private int _numberOfCoins;
 
+        // Networking
+        private float lastSynchronizationTime = 0f;
+        private float syncDelay = 0f;
+        private float syncTime = 0f;
+        private Vector3 syncStartPosition = Vector3.zero;
+        private Vector3 syncEndPosition = Vector3.zero;
+
         /* References */
         private Rigidbody _rb;
 
@@ -47,8 +54,10 @@ namespace Assets.Code
 
             if (GetComponent<NetworkView>().isMine)
                 HandleInput();
+            else
+                SyncedMovement();
 
-            // Limiting player's X coord
+            // Limiting player's X and Y coord
             var position = transform.position;
             position.x = Math.Max(position.x, GameManager.LeftBound);
             position.x = Math.Min(position.x, GameManager.RightBound);
@@ -166,6 +175,34 @@ namespace Assets.Code
             var rightGrounded = Physics.Raycast(rightpoint, -Vector3.up, size);
 
             return leftGrounded || rightGrounded;
+        }
+
+        // Networking stuff
+        void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+        {
+            Vector3 syncPosition = Vector3.zero;
+            if (stream.isWriting)
+            {
+                syncPosition = GetComponent<Rigidbody>().position;
+                stream.Serialize(ref syncPosition);
+            }
+            else
+            {
+                stream.Serialize(ref syncPosition);
+
+                syncTime = 0f;
+                syncDelay = Time.time - lastSynchronizationTime;
+                lastSynchronizationTime = Time.time;
+
+                syncStartPosition = GetComponent<Rigidbody>().position;
+                syncEndPosition = syncPosition;
+            }
+        }
+
+        void SyncedMovement()
+        {
+            syncTime += Time.deltaTime;
+            GetComponent<Rigidbody>().position = Vector3.Lerp(syncStartPosition, syncEndPosition, syncTime / syncDelay);
         }
     }
 }
