@@ -1,82 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using System.Collections;
 
-namespace Assets.Code
-{
-    static class CoinManager
+public class CoinManager : MonoBehaviour {
+
+    /* Properties */
+    public static readonly List<GameObject> UnusedCoins = new List<GameObject>();
+    public static readonly List<GameObject> ActiveCoins = new List<GameObject>();
+
+    /* Constants */
+    private const string CoinPrefabName = "Prefabs/Coin";
+    private const int NumberOfCoinsInBurst = 10;
+
+    //
+    void Start()
     {
-        /* Properties */
-        public static readonly List<GameObject> UnusedCoins = new List<GameObject>();
-        public static readonly List<GameObject> ActiveCoins = new List<GameObject>(); 
+        name = "CoinManager";
+    }
 
-        /* References */
-        private static readonly GameObject CoinAnchor = GameObject.Find("CoinAnchor");
+    /* Functions */
+    public static void CreateCoinAt(Vector3 position)
+    {
+        CreateRecycledCoin(position);
+    }
 
-        /* Constants */
-        private const string CoinPrefabName = "Prefabs/Coin";
-        private const int NumberOfCoinsInBurst = 10;
-
-        /* Functions */
-        public static void CreateCoinAt(Vector3 position)
+    public static void CreateCoinBurstAt(Vector3 position, int numberOfCoins = NumberOfCoinsInBurst)
+    {
+        for (var i = 0; i < numberOfCoins; i++)
         {
-            var coin = CreateRecycledCoin();
-            coin.transform.position = position;
+            var x = UnityEngine.Random.Range(-0.5f, 0.5f);
+            var y = UnityEngine.Random.Range(-1f, 1f);
+
+            var velocity = new Vector3(x, y, 0);
+
+            var coin = CreateRecycledCoin(position + velocity);
+
+            coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
+        }
+    }
+
+    private static GameObject CreateRecycledCoin(Vector3 position)
+    {
+        GameObject coin;
+
+        // Use an unused coin first
+        if (UnusedCoins.Count != 0)
+        {
+            coin = UnusedCoins[0];
+        }
+        // If no unused coins exist, create a new one
+        else
+        {
+            coin = Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
         }
 
-        public static void CreateCoinBurstAt(Vector3 position, int numberOfCoins=NumberOfCoinsInBurst)
-        {
-            for (var i = 0; i < numberOfCoins; i++)
-            {
-                var coin = CreateRecycledCoin();
+        // add the coin to the active coins list
+        coin.GetComponent<Coin>().Activate();
 
-                var x = UnityEngine.Random.Range(-0.5f, 0.5f);
-                var y = UnityEngine.Random.Range(-1f, 1f);
+        return coin;
+    }
 
-                var velocity = new Vector3(x, y, 0);
+    private static GameObject CreateNewCoin(Vector3 position)
+    {
+        return Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
+    }
 
-                coin.transform.position = position + velocity;
-                coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
-            }
-        }
-
-        private static GameObject CreateRecycledCoin()
-        {
-            GameObject coin;
-
-            // Use an unused coin first
-            if (UnusedCoins.Count != 0)
-            {
-                coin = UnusedCoins[0];
-
-                UnusedCoins.RemoveAt(0);
-
-                coin.SetActive(true);
-            }
-            // If no unused coins exist, create a new one
-            else
-            {
-                coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
-            }
-
-            // Call our init function
-            //coin.GetComponent<Coin>().Initialize();
-
-            // add the coin to the active coins list
-            ActiveCoins.Add(coin);
-
-            // Parent it to the anchor
-            coin.transform.parent = CoinAnchor.transform;
-
-            return coin;
-        }
-
-        public static int CountCoins()
-        {
-            return UnusedCoins.Count + ActiveCoins.Count;
-        }
+    public static int CountCoins()
+    {
+        return UnusedCoins.Count + ActiveCoins.Count;
     }
 }

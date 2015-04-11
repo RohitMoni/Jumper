@@ -8,14 +8,16 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    /* Editor Set */
+    public GameObject PlayerPrefab;
+    public GameObject CoinManagerPrefab;
+
     /* Properties */
     private bool _gameStarted;
     private float _timer;
-    private float _coinBurstTimer = 5f;
+    private const float CoinBurstTimer = 5f;
 
     /* References */
-    private NetworkManager _networkManager;
-
     private static Text _debugText;
     private static Slider _jumpSliderLeft;
     private static Slider _jumpSliderRight;
@@ -31,7 +33,6 @@ public class GameManager : MonoBehaviour
 	void Start ()
 	{
 	    _gameStarted = false;
-	    _networkManager = GetComponent<NetworkManager>();
 	}
 
     void Awake()
@@ -48,27 +49,43 @@ public class GameManager : MonoBehaviour
 	    if (!_gameStarted)
 	        return;
 
-	    _timer += Time.smoothDeltaTime;
+        _timer += Time.smoothDeltaTime;
 
-	    if (_networkManager.IsHost)
-	    {
-            if (_timer % _coinBurstTimer < 0.02f)
+        if (Network.isServer)
+        {
+            if (_timer % CoinBurstTimer < 0.02f)
                 CreateCoins();
-	    }
-	    else
-	    {
-	        
-	    }
+        }
+        else
+        {
+
+        }
 	}
 
     public void StartGame()
     {
         _gameStarted = true;
+        SpawnPlayer();
+
+        if (Network.isServer)
+        {
+            CreateCoinManager();
+        }
+    }
+
+    void SpawnPlayer()
+    {
+        Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0);
+    }
+
+    void CreateCoinManager()
+    {
+        Network.Instantiate(CoinManagerPrefab, Vector3.zero, Quaternion.identity, 0);
     }
 
     private void CreateCoins()
     {
-       CoinManager.CreateCoinBurstAt(new Vector3(2, 5, 0), 10);
+       CoinManager.CreateCoinAt(new Vector3(0, 7, 0));
     }
 
     public static void Debug(string text)

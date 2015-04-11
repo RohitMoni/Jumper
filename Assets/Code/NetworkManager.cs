@@ -7,12 +7,7 @@ using System.Collections;
 
 public class NetworkManager : MonoBehaviour {
 
-    /* Editor Set */
-    public GameObject PlayerPrefab;
-
     /* Properties */
-    public bool IsHost;
-    public bool IsClient;
     private HostData[] _hostList;
 
     /* References */
@@ -27,7 +22,6 @@ public class NetworkManager : MonoBehaviour {
 
 	void Start ()
 	{
-	    IsHost = IsClient = false;
 	    _menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
 	    _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 	}
@@ -36,11 +30,6 @@ public class NetworkManager : MonoBehaviour {
 	void Update () {
 	    
 	}
-
-    void SpawnPlayer()
-    {
-        Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0);
-    }
 
     public void StartServer()
     {
@@ -51,9 +40,11 @@ public class NetworkManager : MonoBehaviour {
     void OnServerInitialized()
     {
         Debug.Log("Server Initialized");
-        IsHost = true;
+    }
+
+    void OnPlayerConnected()
+    {
         _gameManager.StartGame();
-        SpawnPlayer();
     }
 
     public void RefreshHostList()
@@ -78,9 +69,13 @@ public class NetworkManager : MonoBehaviour {
     void OnConnectedToServer()
     {
         Debug.Log("Server Joined");
-        IsClient = true;
         _gameManager.StartGame();
-        SpawnPlayer();
     }
 
+    void OnPlayerDisconnected(NetworkPlayer player)
+    {
+        Debug.Log("Clean up after player " + player);
+        Network.RemoveRPCs(player);
+        Network.DestroyPlayerObjects(player);
+    }
 }

@@ -10,17 +10,38 @@ public class Coin : MonoBehaviour
     private Vector3 _syncStartPosition = Vector3.zero;
     private Vector3 _syncEndPosition = Vector3.zero;
 
-    void Update()
+    void Start()
     {
-        if (!GetComponent<NetworkView>().isMine)
-            SyncedMovement();
+        transform.SetParent(GameObject.Find("CoinAnchor").transform);
     }
 
+    void Update()
+    {
+        //if (!GetComponent<NetworkView>().isMine)
+            //SyncedMovement();
+    }
+
+    [RPC]
     public void Collect()
     {
         CoinManager.ActiveCoins.Remove(gameObject);
-        gameObject.SetActive(false);
         CoinManager.UnusedCoins.Add(gameObject);
+
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("Collect", RPCMode.OthersBuffered);
+
+        gameObject.SetActive(false);
+    }
+
+    [RPC]
+    public void Activate()
+    {
+        CoinManager.UnusedCoins.Remove(gameObject);
+        CoinManager.ActiveCoins.Add(gameObject);
+        gameObject.SetActive(true);
+
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("Activate", RPCMode.OthersBuffered);
     }
 
     // Networking stuff

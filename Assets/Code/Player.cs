@@ -164,11 +164,15 @@ namespace Assets.Code
             _canInput = false;
         }
 
+        [RPC]
         public void CollectCoin()
         {
             _numberOfCoins++;
             if (GetComponent<NetworkView>().isMine)
+            {
                 GameManager.UpdateCoinText(_numberOfCoins);
+                GetComponent<NetworkView>().RPC("CollectCoin", RPCMode.OthersBuffered);
+            }
         }
 
         private bool IsGrounded()
