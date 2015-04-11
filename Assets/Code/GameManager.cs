@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateCoins()
     {
-       CoinManager.CreateCoinAt(new Vector3(0, 7, 0));
+       CoinManager.CreateCoinBurstAt(new Vector3(0, 7, 0));
     }
 
     public static void Debug(string text)

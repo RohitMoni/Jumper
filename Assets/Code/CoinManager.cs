@@ -16,6 +16,17 @@ public class CoinManager : MonoBehaviour {
     void Start()
     {
         name = "CoinManager";
+        InitialisePool(50);
+    }
+
+    private static void InitialisePool(int numberOfCoins)
+    {
+        for (var i = 0; i < numberOfCoins; i++)
+        {
+            var coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
+            if (coin)
+                coin.GetComponent<Coin>().DeActivate();
+        }
     }
 
     /* Functions */
@@ -47,6 +58,7 @@ public class CoinManager : MonoBehaviour {
         if (UnusedCoins.Count != 0)
         {
             coin = UnusedCoins[0];
+            coin.GetComponent<Coin>().RePosition(position);
         }
         // If no unused coins exist, create a new one
         else
@@ -58,11 +70,6 @@ public class CoinManager : MonoBehaviour {
         coin.GetComponent<Coin>().Activate();
 
         return coin;
-    }
-
-    private static GameObject CreateNewCoin(Vector3 position)
-    {
-        return Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
     }
 
     public static int CountCoins()

@@ -22,26 +22,52 @@ public class Coin : MonoBehaviour
     }
 
     [RPC]
-    public void Collect()
+    public void RePosition(Vector3 newPosition)
     {
-        CoinManager.ActiveCoins.Remove(gameObject);
-        CoinManager.UnusedCoins.Add(gameObject);
+        transform.position = newPosition;
 
         if (GetComponent<NetworkView>().isMine)
-            GetComponent<NetworkView>().RPC("Collect", RPCMode.OthersBuffered);
+            GetComponent<NetworkView>().RPC("RePosition", RPCMode.OthersBuffered, newPosition);
+    }
 
-        gameObject.SetActive(false);
+    [RPC]
+    public void DeActivate()
+    {
+        SetActive(false);
+
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("DeActivate", RPCMode.OthersBuffered);
     }
 
     [RPC]
     public void Activate()
     {
-        CoinManager.UnusedCoins.Remove(gameObject);
-        CoinManager.ActiveCoins.Add(gameObject);
-        gameObject.SetActive(true);
+        SetActive(true);
 
         if (GetComponent<NetworkView>().isMine)
             GetComponent<NetworkView>().RPC("Activate", RPCMode.OthersBuffered);
+    }
+
+    private void SetActive(bool active)
+    {
+        if (active)
+        {
+            CoinManager.UnusedCoins.Remove(gameObject);
+            CoinManager.ActiveCoins.Add(gameObject);
+        }
+        else
+        {
+            CoinManager.ActiveCoins.Remove(gameObject);
+            CoinManager.UnusedCoins.Add(gameObject);
+        }
+
+        GetComponent<Renderer>().enabled = active;
+        GetComponent<Collider>().enabled = active;
+
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(active);
+        }
     }
 
     // Networking stuff

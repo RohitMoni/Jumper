@@ -39,7 +39,6 @@ public class NetworkManager : MonoBehaviour {
 
     void OnServerInitialized()
     {
-        Debug.Log("Server Initialized");
     }
 
     void OnPlayerConnected()
@@ -68,13 +67,11 @@ public class NetworkManager : MonoBehaviour {
 
     void OnConnectedToServer()
     {
-        Debug.Log("Server Joined");
         _gameManager.StartGame();
     }
 
     void OnPlayerDisconnected(NetworkPlayer player)
     {
-        Debug.Log("Clean up after player " + player);
         Network.RemoveRPCs(player);
         Network.DestroyPlayerObjects(player);
     }
