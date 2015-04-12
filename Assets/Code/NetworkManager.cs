@@ -39,11 +39,11 @@ public class NetworkManager : MonoBehaviour {
 
     void OnServerInitialized()
     {
+        _gameManager.StartGame();
     }
 
     void OnPlayerConnected()
     {
-        _gameManager.StartGame();
     }
 
     public void RefreshHostList()

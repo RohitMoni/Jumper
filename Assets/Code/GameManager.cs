@@ -46,6 +46,9 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+	    if (Input.GetKeyDown(KeyCode.Tab))
+	        CoinManager.CountCoins();
+
 	    if (!_gameStarted)
 	        return;
 
@@ -53,7 +56,7 @@ public class GameManager : MonoBehaviour
 
         if (Network.isServer)
         {
-            if (_timer % CoinBurstTimer < 0.02f)
+            if (_timer % CoinBurstTimer < 0.02f && _timer > 5f && _timer < CoinBurstTimer*11)
                 CreateCoins();
         }
         else

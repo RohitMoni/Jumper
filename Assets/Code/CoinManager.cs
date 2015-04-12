@@ -74,6 +74,8 @@ public class CoinManager : MonoBehaviour {
 
     public static int CountCoins()
     {
+        Debug.Log("Unused Coins: " + UnusedCoins.Count);
+        Debug.Log("Active Coins: " + ActiveCoins.Count);
         return UnusedCoins.Count + ActiveCoins.Count;
     }
 }
