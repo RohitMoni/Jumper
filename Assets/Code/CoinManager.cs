@@ -30,7 +30,10 @@ public class CoinManager : MonoBehaviour {
         {
             var coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
             if (coin)
+            {
+                coin.GetComponent<Coin>().Initialise();
                 coin.GetComponent<Coin>().DeActivate();
+            }
         }
     }
 
@@ -63,12 +66,14 @@ public class CoinManager : MonoBehaviour {
         if (UnusedCoins.Count != 0)
         {
             coin = UnusedCoins[0];
+            coin.GetComponent<Coin>().Initialise();
             coin.GetComponent<Coin>().RePosition(position);
         }
         // If no unused coins exist, create a new one
         else
         {
             coin = Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
+            coin.GetComponent<Coin>().Initialise();
         }
 
         // add the coin to the active coins list

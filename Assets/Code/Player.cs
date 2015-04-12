@@ -8,9 +8,11 @@ namespace Assets.Code
         /* Properties */
         private bool _canInput;
         private bool _isTouching;
+        private bool _isGrounded;
         private float _inputHoldTime;
         private float _cooldownTimer;
         private int _numberOfCoins;
+        private NetworkView _networkView;
 
         // Networking
         private float _lastSynchronizationTime = 0f;
@@ -23,6 +25,7 @@ namespace Assets.Code
         private Rigidbody _rb;
 
         /* Constants */
+        private const float PercentageOfHeightAllowedForGrounding = 1f;
         private const float MinimumInputHoldTime = 0.1f;
         public const float MaximumInputHoldTime = 0.75f;
         private const float JumpCooldown = 0f;
@@ -33,7 +36,9 @@ namespace Assets.Code
         void Start()
         {
             name = "Player";
-            if (GetComponent<NetworkView>().isMine)
+            _networkView = GetComponent<NetworkView>();
+
+            if (_networkView.isMine)
             {
                 transform.SetParent(GameObject.Find("GameAnchor").transform);
                 var camera = Camera.main;
@@ -60,7 +65,7 @@ namespace Assets.Code
         // Update is called once per frame
         void Update () {
 
-            if (GetComponent<NetworkView>().isMine)
+            if (_networkView.isMine)
                 HandleInput();
             else
                 SyncedMovement();
@@ -72,6 +77,8 @@ namespace Assets.Code
             position.y = Math.Min(position.y, GameManager.TopBound);
 
             transform.position = position;
+
+            _isGrounded = false;
         }
 
         private void HandleInput()
@@ -168,26 +175,35 @@ namespace Assets.Code
         public void CollectCoin()
         {
             _numberOfCoins++;
-            if (GetComponent<NetworkView>().isMine)
+            if (_networkView.isMine)
             {
                 GameManager.UpdateCoinText(_numberOfCoins);
-                GetComponent<NetworkView>().RPC("CollectCoin", RPCMode.OthersBuffered);
+                _networkView.RPC("CollectCoin", RPCMode.OthersBuffered);
             }
         }
 
         private bool IsGrounded()
         {
-            var size = transform.localScale.x;
+            return _isGrounded;
+        }
 
-            var leftPoint = transform.position;
-            var rightpoint = leftPoint;
-            leftPoint.x -= size;
-            rightpoint.x += size;
+        public void OnCollisionStay(Collision collision)
+        {
+            foreach (var contact in collision.contacts)
+            {
+                // the contact point relative to the player
+                var contactPointPlayerSpace = contact.point - transform.position + (transform.localScale);
 
-            var leftGrounded = Physics.Raycast(leftPoint, -Vector3.up, size);
-            var rightGrounded = Physics.Raycast(rightpoint, -Vector3.up, size);
+                // the minimum y position of the contact
+                var requiredYPosition = transform.localScale.y * PercentageOfHeightAllowedForGrounding;
 
-            return leftGrounded || rightGrounded;
+                // make our check
+                if (contactPointPlayerSpace.y < requiredYPosition)
+                {
+                    _isGrounded = true;
+                    break;
+                }
+            }
         }
 
         // Networking stuff
