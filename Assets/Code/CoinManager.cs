@@ -46,7 +46,7 @@ public class CoinManager : MonoBehaviour {
 
             var coin = CreateRecycledCoin(position + velocity);
 
-            coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
+            //coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
         }
     }
 
