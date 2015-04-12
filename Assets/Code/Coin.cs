@@ -11,16 +11,20 @@ public class Coin : MonoBehaviour
     private Vector3 _syncStartPosition = Vector3.zero;
     private Vector3 _syncEndPosition = Vector3.zero;
 
-    public void Initialise()
+    void Awake()
     {
         name = "Coin";
-        transform.SetParent(GameObject.Find("CoinAnchor").transform);
         _networkView = GetComponent<NetworkView>();
+        transform.SetParent(GameObject.Find("CoinAnchor").transform);
+    }
+
+    public void Initialise()
+    {
     }
 
     void Update()
     {
-        if (!_networkView.isMine)
+        if (!GetComponent<NetworkView>().isMine)
             SyncedMovement();
     }
 
@@ -29,8 +33,8 @@ public class Coin : MonoBehaviour
     {
         transform.position = newPosition;
 
-        if (_networkView.isMine)
-            _networkView.RPC("RePosition", RPCMode.OthersBuffered, newPosition);
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("RePosition", RPCMode.OthersBuffered, newPosition);
     }
 
     [RPC]
@@ -38,8 +42,8 @@ public class Coin : MonoBehaviour
     {
         SetActive(false);
 
-        if (_networkView.isMine)
-            _networkView.RPC("DeActivate", RPCMode.OthersBuffered);
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("DeActivate", RPCMode.OthersBuffered);
     }
 
     [RPC]
@@ -47,8 +51,8 @@ public class Coin : MonoBehaviour
     {
         SetActive(true);
 
-        if (_networkView.isMine)
-            _networkView.RPC("Activate", RPCMode.OthersBuffered);
+        if (GetComponent<NetworkView>().isMine)
+            GetComponent<NetworkView>().RPC("Activate", RPCMode.OthersBuffered);
     }
 
     private void SetActive(bool active)
@@ -65,7 +69,6 @@ public class Coin : MonoBehaviour
         }
 
         GetComponent<Renderer>().enabled = active;
-        GetComponent<Collider>().enabled = active;
 
         foreach (Transform child in transform)
         {

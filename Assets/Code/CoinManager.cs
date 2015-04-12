@@ -11,12 +11,13 @@ public class CoinManager : MonoBehaviour {
     /* Constants */
     private const string CoinPrefabName = "Prefabs/Coin";
     private const int NumberOfCoinsInBurst = 10;
+    private const int NumberOfCoinsInPool = 50;
 
     //
     void Start()
     {
         name = "CoinManager";
-        InitialisePool(50);
+        InitialisePool(NumberOfCoinsInPool);
     }
 
     void Update()
@@ -29,11 +30,8 @@ public class CoinManager : MonoBehaviour {
         for (var i = 0; i < numberOfCoins; i++)
         {
             var coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
-            if (coin)
-            {
-                coin.GetComponent<Coin>().Initialise();
-                coin.GetComponent<Coin>().DeActivate();
-            }
+            coin.GetComponent<Coin>().Initialise();
+            coin.GetComponent<Coin>().DeActivate();
         }
     }
 
@@ -52,34 +50,19 @@ public class CoinManager : MonoBehaviour {
 
             var velocity = new Vector3(x, y, 0);
 
-            var coin = CreateRecycledCoin(position + velocity);
-
-            //coin.GetComponent<Rigidbody>().AddForce(velocity * 10 * Time.smoothDeltaTime);
+            CreateRecycledCoin(position + velocity);
         }
     }
 
-    private static GameObject CreateRecycledCoin(Vector3 position)
+    private static void CreateRecycledCoin(Vector3 position)
     {
-        GameObject coin;
-
         // Use an unused coin first
-        if (UnusedCoins.Count != 0)
-        {
-            coin = UnusedCoins[0];
-            coin.GetComponent<Coin>().Initialise();
-            coin.GetComponent<Coin>().RePosition(position);
-        }
-        // If no unused coins exist, create a new one
-        else
-        {
-            coin = Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
-            coin.GetComponent<Coin>().Initialise();
-        }
+        if (UnusedCoins.Count == 0) return;
 
-        // add the coin to the active coins list
+        var coin = UnusedCoins[0];
+        coin.GetComponent<Coin>().RePosition(position);
+
         coin.GetComponent<Coin>().Activate();
-
-        return coin;
     }
 
     private static void SeparateCoins()
@@ -101,7 +84,7 @@ public class CoinManager : MonoBehaviour {
                 }
             }
 
-            coin.transform.position += movement;
+            coin.GetComponent<Coin>().RePosition(coin.transform.position + movement);
         }
     }
 
