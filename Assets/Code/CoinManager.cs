@@ -19,13 +19,21 @@ public class CoinManager : MonoBehaviour {
         InitialisePool(50);
     }
 
+    void Update()
+    {
+        SeparateCoins();
+    }
+
     private static void InitialisePool(int numberOfCoins)
     {
         for (var i = 0; i < numberOfCoins; i++)
         {
             var coin = Network.Instantiate(Resources.Load(CoinPrefabName), Vector3.zero, Quaternion.identity, 0) as GameObject;
             if (coin)
+            {
+                coin.GetComponent<Coin>().Initialise();
                 coin.GetComponent<Coin>().DeActivate();
+            }
         }
     }
 
@@ -58,18 +66,43 @@ public class CoinManager : MonoBehaviour {
         if (UnusedCoins.Count != 0)
         {
             coin = UnusedCoins[0];
+            coin.GetComponent<Coin>().Initialise();
             coin.GetComponent<Coin>().RePosition(position);
         }
         // If no unused coins exist, create a new one
         else
         {
             coin = Network.Instantiate(Resources.Load(CoinPrefabName), position, Quaternion.identity, 0) as GameObject;
+            coin.GetComponent<Coin>().Initialise();
         }
 
         // add the coin to the active coins list
         coin.GetComponent<Coin>().Activate();
 
         return coin;
+    }
+
+    private static void SeparateCoins()
+    {
+        foreach (var coin in ActiveCoins)
+        {
+            var movement = Vector3.zero;
+
+            foreach (var coin2 in ActiveCoins)
+            {
+                if (coin != coin2)
+                {
+                    var difference = coin.transform.position - coin2.transform.position;
+                    var magnitude = difference.magnitude;
+                    if (magnitude <= 0.6)
+                    {
+                        movement += 1f * difference;
+                    }
+                }
+            }
+
+            coin.transform.position += movement;
+        }
     }
 
     public static int CountCoins()

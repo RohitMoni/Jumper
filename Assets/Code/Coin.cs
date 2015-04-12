@@ -4,21 +4,24 @@ using UnityEngine;
 public class Coin : MonoBehaviour
 {
     // Networking
+    private NetworkView _networkView;
     private float _lastSynchronizationTime = 0f;
     private float _syncDelay = 0f;
     private float _syncTime = 0f;
     private Vector3 _syncStartPosition = Vector3.zero;
     private Vector3 _syncEndPosition = Vector3.zero;
 
-    void Start()
+    public void Initialise()
     {
+        name = "Coin";
         transform.SetParent(GameObject.Find("CoinAnchor").transform);
+        _networkView = GetComponent<NetworkView>();
     }
 
     void Update()
     {
-        //if (!GetComponent<NetworkView>().isMine)
-            //SyncedMovement();
+        if (!_networkView.isMine)
+            SyncedMovement();
     }
 
     [RPC]
@@ -26,8 +29,8 @@ public class Coin : MonoBehaviour
     {
         transform.position = newPosition;
 
-        if (GetComponent<NetworkView>().isMine)
-            GetComponent<NetworkView>().RPC("RePosition", RPCMode.OthersBuffered, newPosition);
+        if (_networkView.isMine)
+            _networkView.RPC("RePosition", RPCMode.OthersBuffered, newPosition);
     }
 
     [RPC]
@@ -35,8 +38,8 @@ public class Coin : MonoBehaviour
     {
         SetActive(false);
 
-        if (GetComponent<NetworkView>().isMine)
-            GetComponent<NetworkView>().RPC("DeActivate", RPCMode.OthersBuffered);
+        if (_networkView.isMine)
+            _networkView.RPC("DeActivate", RPCMode.OthersBuffered);
     }
 
     [RPC]
@@ -44,8 +47,8 @@ public class Coin : MonoBehaviour
     {
         SetActive(true);
 
-        if (GetComponent<NetworkView>().isMine)
-            GetComponent<NetworkView>().RPC("Activate", RPCMode.OthersBuffered);
+        if (_networkView.isMine)
+            _networkView.RPC("Activate", RPCMode.OthersBuffered);
     }
 
     private void SetActive(bool active)
