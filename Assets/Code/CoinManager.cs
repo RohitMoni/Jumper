@@ -19,6 +19,11 @@ public class CoinManager : MonoBehaviour {
         InitialisePool(50);
     }
 
+    void Update()
+    {
+        SeparateCoins();
+    }
+
     private static void InitialisePool(int numberOfCoins)
     {
         for (var i = 0; i < numberOfCoins; i++)
@@ -70,6 +75,29 @@ public class CoinManager : MonoBehaviour {
         coin.GetComponent<Coin>().Activate();
 
         return coin;
+    }
+
+    private static void SeparateCoins()
+    {
+        foreach (var coin in ActiveCoins)
+        {
+            var movement = Vector3.zero;
+
+            foreach (var coin2 in ActiveCoins)
+            {
+                if (coin != coin2)
+                {
+                    var difference = coin.transform.position - coin2.transform.position;
+                    var magnitude = difference.magnitude;
+                    if (magnitude <= 0.6)
+                    {
+                        movement += 1f * difference;
+                    }
+                }
+            }
+
+            coin.transform.position += movement;
+        }
     }
 
     public static int CountCoins()
