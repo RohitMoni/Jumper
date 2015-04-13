@@ -9,6 +9,8 @@ public class MenuManager : MonoBehaviour
 
     private GameObject _mainMenu;
     private GameObject _findGameMenu;
+    private GameObject _logInPanel;
+    private GameObject _loggedInPanel;
     private NetworkManager _networkManager;
     private GameObject _contentPanel;
 
@@ -19,14 +21,29 @@ public class MenuManager : MonoBehaviour
         _findGameMenu = gameObject.transform.FindChild("FindGameMenu").gameObject;
 	    _networkManager = GameObject.Find("GameManager").GetComponent<NetworkManager>();
 	    _contentPanel = GameObject.Find("ContentPanel");
+	    _logInPanel = _mainMenu.transform.FindChild("LogInPanel").gameObject;
+        _loggedInPanel = _mainMenu.transform.FindChild("LoggedInPanel").gameObject;
 
 	    _findGameMenu.SetActive(false);
+	    _loggedInPanel.SetActive(false);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public void LoggedIn()
+    {
+        _logInPanel.SetActive(false);
+        _loggedInPanel.SetActive(true);
+    }
+
+    public void LoggedOut()
+    {
+        _logInPanel.SetActive(true);
+        _loggedInPanel.SetActive(false);
+    }
 
     public void MainMenuToFindGameMenu()
     {
