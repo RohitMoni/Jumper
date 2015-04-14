@@ -28,11 +28,12 @@ namespace Assets.Code.Database
         private PlayerProfileManager()
         {
             _playerDb = new SqliteDatabase("player.db");
+            _playerDb.ExecuteScript("CREATE TABLE IF NOT EXISTS 'Players' (PlayerName varchar(255), PlayerPassword varchar(255), Coins int)");
         }
 
         public LoginAttemptResult AttemptLogin(string playerName, string playerPassword)
         {
-            var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM players WHERE PlayerName = '" + playerName + "'");
+            var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM Players WHERE PlayerName = '" + playerName + "'");
 
             if (data == null || data.Columns.Count == 0)
             {
@@ -65,7 +66,7 @@ namespace Assets.Code.Database
         public int GetCoinsForLoggedInUser()
         {
             if (CurrentPlayer != null)
-                return int.Parse(_playerDb.ExecuteQuery("GET Coins WHERE PlayerName = '" + CurrentPlayer + "'").Columns[0]);
+                return int.Parse(_playerDb.ExecuteQuery("SELECT Coins FROM Players WHERE PlayerName = '" + CurrentPlayer + "'").Columns[0]);
             
             Debug.Log("NOTE! Get Coins failed (player is not logged in)");
             return -1;

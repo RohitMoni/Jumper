@@ -6,6 +6,7 @@ namespace Assets.Code
     public class Player : MonoBehaviour {
 
         /* Properties */
+        public string AccountName;
         private bool _canInput;
         private bool _isTouching;
         private bool _isGrounded;
@@ -53,6 +54,7 @@ namespace Assets.Code
 
         void Awake()
         {
+            AccountName = "Player";
             _canInput = true;
             _isTouching = false;
         
@@ -179,6 +181,17 @@ namespace Assets.Code
             {
                 GameManager.UpdateCoinText(_numberOfCoins);
                 _networkView.RPC("CollectCoin", RPCMode.OthersBuffered);
+            }
+        }
+
+        [RPC]
+        public void SetName(string newName)
+        {
+            AccountName = newName;
+
+            if (_networkView.isMine)
+            {
+                _networkView.RPC("SetName", RPCMode.OthersBuffered, newName);
             }
         }
 
