@@ -187,6 +187,28 @@ namespace Assets.Code
         }
 
         [RPC]
+        public void GainCoins(int number)
+        {
+            _numberOfCoins += number;
+            if (_networkView.isMine)
+            {
+                GameManager.UpdateCoinText(_numberOfCoins);
+                _networkView.RPC("CollectCoin", RPCMode.OthersBuffered, number);
+            }
+        }
+
+        [RPC]
+        public void LoseCoins(int number)
+        {
+            _numberOfCoins -= number;
+            if (_networkView.isMine)
+            {
+                GameManager.UpdateCoinText(_numberOfCoins);
+                _networkView.RPC("CollectCoin", RPCMode.OthersBuffered, number);
+            }
+        }
+
+        [RPC]
         public void SetName(string newName)
         {
             AccountName = newName;
@@ -217,6 +239,24 @@ namespace Assets.Code
                 if (contactPointPlayerSpace.y < requiredYPosition)
                 {
                     _isGrounded = true;
+                    break;
+                }
+            }
+        }
+
+        public void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.name != "Player")
+                return;
+
+            foreach (var contact in collision.contacts)
+            {
+                var relativePosition = transform.InverseTransformPoint(contact.point);
+
+                if (relativePosition.y > 0)
+                {
+                    collision.gameObject.GetComponent<Player>().GainCoins(_numberOfCoins/2);
+                    LoseCoins(_numberOfCoins/2);
                     break;
                 }
             }

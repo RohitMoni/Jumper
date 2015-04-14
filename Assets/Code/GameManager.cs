@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     /* Properties */
     private bool _gameStarted;
     private float _timer;
-    private const float CoinBurstTimer = 5f;
+    private const float CoinBurstTimer = 10f;
 
     /* References */
     private static Text _debugText;

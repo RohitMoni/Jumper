@@ -10,7 +10,7 @@ public class CoinManager : MonoBehaviour {
 
     /* Constants */
     private const string CoinPrefabName = "Prefabs/Coin";
-    private const int NumberOfCoinsInBurst = 10;
+    private const int NumberOfCoinsInBurst = 3;
     private const int NumberOfCoinsInPool = 50;
 
     //
