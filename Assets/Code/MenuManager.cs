@@ -11,8 +11,8 @@ public class MenuManager : MonoBehaviour
     private GameObject _findGameMenu;
     private GameObject _logInPanel;
     private GameObject _loggedInPanel;
-    private NetworkManager _networkManager;
     private GameObject _contentPanel;
+    private NetworkManager _networkManager;
 
 	// Use this for initialization
 	void Start ()
@@ -33,10 +33,11 @@ public class MenuManager : MonoBehaviour
 	
 	}
 
-    public void LoggedIn()
+    public void LoggedIn(string userName, int numberOfCoins)
     {
         _logInPanel.SetActive(false);
         _loggedInPanel.SetActive(true);
+        _networkManager.CurrentLoggedInUser = userName;
     }
 
     public void LoggedOut()

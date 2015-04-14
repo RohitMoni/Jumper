@@ -8,6 +8,7 @@ using System.Collections;
 public class NetworkManager : MonoBehaviour {
 
     /* Properties */
+    public string CurrentLoggedInUser;
     private HostData[] _hostList;
 
     /* References */
@@ -16,12 +17,12 @@ public class NetworkManager : MonoBehaviour {
 
     /* Constants */
     private const string GameTypeName = "RM_Jumper";
-    private const string GameName = "Jumper_1";
     private const int NumberOfPlayers = 4;
     private const int PortNumber = 25000;
 
 	void Start ()
 	{
+	    CurrentLoggedInUser = "Player";
 	    _menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
 	    _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 	}
@@ -34,7 +35,7 @@ public class NetworkManager : MonoBehaviour {
     public void StartServer()
     {
         Network.InitializeServer(NumberOfPlayers, PortNumber, !Network.HavePublicAddress());
-        MasterServer.RegisterHost(GameTypeName, GameName);
+        MasterServer.RegisterHost(GameTypeName, CurrentLoggedInUser + "'s Game");
     }
 
     void OnServerInitialized()
@@ -45,6 +46,7 @@ public class NetworkManager : MonoBehaviour {
     void OnPlayerConnected()
     {
         _gameManager.StartGame();
+        _gameManager.SpawnPlayer(CurrentLoggedInUser);
     }
 
     public void RefreshHostList()
@@ -69,6 +71,7 @@ public class NetworkManager : MonoBehaviour {
     void OnConnectedToServer()
     {
         _gameManager.StartGame();
+        _gameManager.SpawnPlayer(CurrentLoggedInUser);
     }
 
     void OnPlayerDisconnected(NetworkPlayer player)

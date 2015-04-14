@@ -68,7 +68,6 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         _gameStarted = true;
-        SpawnPlayer();
 
         if (Network.isServer)
         {
@@ -76,9 +75,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void SpawnPlayer()
+    public void SpawnPlayer(string playerName)
     {
-        Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0);
+        var player = Network.Instantiate(PlayerPrefab, new Vector3(0, 5f, 0), Quaternion.identity, 0) as GameObject;
+        player.GetComponent<Player>().SetName(playerName);
     }
 
     void CreateCoinManager()

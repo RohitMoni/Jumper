@@ -28,10 +28,13 @@ public class LogInPanelScript : MonoBehaviour
 
             if (result == LoginAttemptResult.Success)
             {
+            }
+            else
+            {
                 
             }
-            
-            _menuManager.LoggedIn();
+
+            _menuManager.LoggedIn(username, 100);
             _password.text = "";
         }
     }
