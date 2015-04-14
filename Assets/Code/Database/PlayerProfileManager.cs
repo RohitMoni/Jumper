@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace Assets.Code.Database
 {
@@ -31,17 +32,30 @@ namespace Assets.Code.Database
             _playerDb.ExecuteScript("CREATE TABLE IF NOT EXISTS 'Players' (PlayerName varchar(255), PlayerPassword varchar(255), Coins int)");
         }
 
+        public void ReadAllInPlayers()
+        {
+            var data = _playerDb.ExecuteQuery("SELECT * FROM Players");
+
+            foreach (var row in data.Rows)
+                foreach(var item in row)
+                    Debug.Log("row item : " + item);
+            foreach (var column in data.Columns)
+                Debug.Log("Columns: " + column);
+        }
+
         public LoginAttemptResult AttemptLogin(string playerName, string playerPassword)
         {
             var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM Players WHERE PlayerName = '" + playerName + "'");
 
-            if (data == null || data.Columns.Count == 0)
+            if (data == null || data.Rows.Count == 0)
             {
                 Debug.Log("NOTE! Login Attempt failed (wrong user name)");
                 return LoginAttemptResult.WrongUserName;
             }
 
-            if (data.Columns[1] == playerPassword)
+            var fuckthis = data.Rows[0].ToList()[1];
+
+            if (fuckthis.Value.ToString() == playerPassword)
             {
                 CurrentPlayer = playerName;
                 return LoginAttemptResult.Success;
@@ -53,9 +67,7 @@ namespace Assets.Code.Database
 
         public void CreateAccount(string playerName, string playerPassword, int coins)
         {
-            _playerDb.ExecuteNonQuery("INSERT INTO Players (PlayerName, PlayerPassword, Coins) VALUES ('" + playerName + "', " + 
-                                                                                                    "'" + playerPassword + "', " +
-                                                                                                    "'" + coins + "')");
+            _playerDb.ExecuteNonQuery("INSERT INTO Players VALUES ('" + playerName + "', " + "'" + playerPassword + "', " + "'" + coins + "');");
         }
 
         public void DeleteAccount(string playerName)
@@ -66,8 +78,13 @@ namespace Assets.Code.Database
         public int GetCoinsForLoggedInUser()
         {
             if (CurrentPlayer != null)
-                return int.Parse(_playerDb.ExecuteQuery("SELECT Coins FROM Players WHERE PlayerName = '" + CurrentPlayer + "'").Columns[0]);
-            
+            {
+                return
+                    (int)
+                        _playerDb.ExecuteQuery("SELECT Coins FROM Players WHERE PlayerName = '" + CurrentPlayer + "'")
+                            .Rows[0].ToList()[0].Value;
+            }
+
             Debug.Log("NOTE! Get Coins failed (player is not logged in)");
             return -1;
         }

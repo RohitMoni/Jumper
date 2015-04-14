@@ -13,27 +13,32 @@ public class MenuManager : MonoBehaviour
     private GameObject _loggedInPanel;
     private GameObject _contentPanel;
     private NetworkManager _networkManager;
+    private Text _loggedInCoins;
+
+    void Awake()
+    {
+        _mainMenu = gameObject.transform.FindChild("MainMenu").gameObject;
+        _findGameMenu = gameObject.transform.FindChild("FindGameMenu").gameObject;
+        _networkManager = GameObject.Find("GameManager").GetComponent<NetworkManager>();
+        _contentPanel = GameObject.Find("ContentPanel");
+        _logInPanel = _mainMenu.transform.FindChild("LogInPanel").gameObject;
+        _loggedInPanel = _mainMenu.transform.FindChild("LoggedInPanel").gameObject;
+        _loggedInCoins = GameObject.Find("LoggedInNumberOfCoins").GetComponent<Text>();
+    }
 
 	// Use this for initialization
 	void Start ()
 	{
-	    _mainMenu = gameObject.transform.FindChild("MainMenu").gameObject;
-        _findGameMenu = gameObject.transform.FindChild("FindGameMenu").gameObject;
-	    _networkManager = GameObject.Find("GameManager").GetComponent<NetworkManager>();
-	    _contentPanel = GameObject.Find("ContentPanel");
-	    _logInPanel = _mainMenu.transform.FindChild("LogInPanel").gameObject;
-        _loggedInPanel = _mainMenu.transform.FindChild("LoggedInPanel").gameObject;
-
 	    _findGameMenu.SetActive(false);
 	    _loggedInPanel.SetActive(false);
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
 
-    public void LoggedIn(string userName, int numberOfCoins)
+    public void LoggedIn(string userName)
     {
         _logInPanel.SetActive(false);
         _loggedInPanel.SetActive(true);
@@ -57,6 +62,13 @@ public class MenuManager : MonoBehaviour
     {
         _mainMenu.SetActive(true);
         _findGameMenu.SetActive(false);
+    }
+
+    public void InGameToMenu(int CoinBonus=0)
+    {
+        _mainMenu.SetActive(true);
+        if (_networkManager.CurrentLoggedInUser != "Player")
+            _loggedInCoins.text = (int.Parse(_loggedInCoins.text) + CoinBonus).ToString();
     }
 
     public void CreateGame()

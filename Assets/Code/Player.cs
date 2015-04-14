@@ -193,7 +193,7 @@ namespace Assets.Code
             if (_networkView.isMine)
             {
                 GameManager.UpdateCoinText(_numberOfCoins);
-                _networkView.RPC("CollectCoin", RPCMode.OthersBuffered, number);
+                _networkView.RPC("GainCoins", RPCMode.OthersBuffered, number);
             }
         }
 
@@ -204,7 +204,7 @@ namespace Assets.Code
             if (_networkView.isMine)
             {
                 GameManager.UpdateCoinText(_numberOfCoins);
-                _networkView.RPC("CollectCoin", RPCMode.OthersBuffered, number);
+                _networkView.RPC("LoseCoins", RPCMode.OthersBuffered, number);
             }
         }
 

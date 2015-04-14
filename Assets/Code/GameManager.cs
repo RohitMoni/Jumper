@@ -59,10 +59,6 @@ public class GameManager : MonoBehaviour
             if (_timer % CoinBurstTimer < 0.02f && _timer > 5f && _timer < CoinBurstTimer*11)
                 CreateCoins();
         }
-        else
-        {
-
-        }
 	}
 
     public void StartGame()
