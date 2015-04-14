@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net.Mime;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Code
 {
@@ -37,7 +39,6 @@ namespace Assets.Code
         void Start()
         {
             name = "Player";
-            _networkView = GetComponent<NetworkView>();
 
             if (_networkView.isMine)
             {
@@ -54,6 +55,7 @@ namespace Assets.Code
 
         void Awake()
         {
+            _networkView = GetComponent<NetworkView>();
             AccountName = "Player";
             _canInput = true;
             _isTouching = false;
@@ -188,6 +190,7 @@ namespace Assets.Code
         public void SetName(string newName)
         {
             AccountName = newName;
+            transform.FindChild("Canvas").FindChild("Text").GetComponent<Text>().text = newName;
 
             if (_networkView.isMine)
             {

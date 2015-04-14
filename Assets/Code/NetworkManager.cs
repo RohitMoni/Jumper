@@ -40,13 +40,14 @@ public class NetworkManager : MonoBehaviour {
 
     void OnServerInitialized()
     {
-        //_gameManager.StartGame();
+        _gameManager.StartGame();
+        _gameManager.SpawnPlayer(CurrentLoggedInUser);
     }
 
     void OnPlayerConnected()
     {
-        _gameManager.StartGame();
-        _gameManager.SpawnPlayer(CurrentLoggedInUser);
+        //_gameManager.StartGame();
+        //_gameManager.SpawnPlayer(CurrentLoggedInUser);
     }
 
     public void RefreshHostList()
