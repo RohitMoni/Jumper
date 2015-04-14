@@ -29,7 +29,7 @@ namespace Assets.Code.Database
 
         public LoginAttemptResult AttemptLogin(string playerName, string playerPassword)
         {
-            var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM players WHERE PlayerName = " + playerName);
+            var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM players WHERE PlayerName = '" + playerName + "'");
 
             if (data.Columns.Count == 0)
             {
@@ -47,12 +47,33 @@ namespace Assets.Code.Database
             return LoginAttemptResult.WrongPassword;
         }
 
-        public void ClaimCoins(int coins)
+        public void CreateAccount(string playerName, string playerPassword, int coins)
+        {
+            _playerDb.ExecuteScript("INSERT INTO Players (PlayerName, PlayerPassword, Coins) VALUES ('" + playerName + "', " + 
+                                                                                                    "'" + playerPassword + "', " +
+                                                                                                    "'" + coins + "')");
+        }
+
+        public void DeleteAccount(string playerName)
+        {
+            _playerDb.ExecuteScript("DELETE FROM Players WHERE PlayerName = '" + playerName + "'");
+        }
+
+        public int GetCoinsForLoggedInUser()
+        {
+            if (CurrentPlayer != null)
+                return int.Parse(_playerDb.ExecuteQuery("GET Coins WHERE PlayerName = '" + CurrentPlayer + "'").Columns[0]);
+            
+            Debug.Log("NOTE! Get Coins failed (player is not logged in)");
+            return -1;
+        }
+
+        public void SetCoinsForLoggedInUser(int coins)
         {
             if(CurrentPlayer != null)
-                _playerDb.ExecuteNonQuery("UPDATE Players SET Coins = " + coins + " WHERE PlayerName = " + CurrentPlayer);
+                _playerDb.ExecuteScript("UPDATE Players SET Coins = " + coins + " WHERE PlayerName = '" + CurrentPlayer + "'");
             else
-                Debug.Log("NOTE! Claim Coins failed (player is not logged in)");
+                Debug.Log("NOTE! Set Coins failed (player is not logged in)");
         }
     }
 }
