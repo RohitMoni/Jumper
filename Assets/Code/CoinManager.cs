@@ -45,8 +45,8 @@ public class CoinManager : MonoBehaviour {
     {
         for (var i = 0; i < numberOfCoins; i++)
         {
-            var x = UnityEngine.Random.Range(-0.5f, 0.5f);
-            var y = UnityEngine.Random.Range(-1f, 1f);
+            var x = Random.Range(-0.5f, 0.5f);
+            var y = Random.Range(-1f, 1f);
 
             var velocity = new Vector3(x, y, 0);
 
