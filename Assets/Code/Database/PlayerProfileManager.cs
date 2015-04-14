@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Code.Database
 {
@@ -21,6 +20,10 @@ namespace Assets.Code.Database
         private readonly SqliteDatabase _playerDb;
 
         public string CurrentPlayer;
+        public bool IsLoggedIn
+        {
+            get { return CurrentPlayer != null; }
+        }
 
         private PlayerProfileManager()
         {
@@ -31,7 +34,7 @@ namespace Assets.Code.Database
         {
             var data = _playerDb.ExecuteQuery("SELECT PlayerName, PlayerPassword FROM players WHERE PlayerName = '" + playerName + "'");
 
-            if (data.Columns.Count == 0)
+            if (data == null || data.Columns.Count == 0)
             {
                 Debug.Log("NOTE! Login Attempt failed (wrong user name)");
                 return LoginAttemptResult.WrongUserName;
@@ -49,14 +52,14 @@ namespace Assets.Code.Database
 
         public void CreateAccount(string playerName, string playerPassword, int coins)
         {
-            _playerDb.ExecuteScript("INSERT INTO Players (PlayerName, PlayerPassword, Coins) VALUES ('" + playerName + "', " + 
+            _playerDb.ExecuteNonQuery("INSERT INTO Players (PlayerName, PlayerPassword, Coins) VALUES ('" + playerName + "', " + 
                                                                                                     "'" + playerPassword + "', " +
                                                                                                     "'" + coins + "')");
         }
 
         public void DeleteAccount(string playerName)
         {
-            _playerDb.ExecuteScript("DELETE FROM Players WHERE PlayerName = '" + playerName + "'");
+            _playerDb.ExecuteNonQuery("DELETE FROM Players WHERE PlayerName = '" + playerName + "'");
         }
 
         public int GetCoinsForLoggedInUser()
@@ -71,7 +74,7 @@ namespace Assets.Code.Database
         public void SetCoinsForLoggedInUser(int coins)
         {
             if(CurrentPlayer != null)
-                _playerDb.ExecuteScript("UPDATE Players SET Coins = " + coins + " WHERE PlayerName = '" + CurrentPlayer + "'");
+                _playerDb.ExecuteNonQuery("UPDATE Players SET Coins = " + coins + " WHERE PlayerName = '" + CurrentPlayer + "'");
             else
                 Debug.Log("NOTE! Set Coins failed (player is not logged in)");
         }

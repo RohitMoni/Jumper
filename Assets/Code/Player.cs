@@ -212,7 +212,7 @@ namespace Assets.Code
             Vector3 syncPosition = Vector3.zero;
             if (stream.isWriting)
             {
-                syncPosition = GetComponent<Rigidbody>().position;
+                syncPosition = transform.position;
                 stream.Serialize(ref syncPosition);
             }
             else
@@ -223,7 +223,7 @@ namespace Assets.Code
                 _syncDelay = Time.time - _lastSynchronizationTime;
                 _lastSynchronizationTime = Time.time;
 
-                _syncStartPosition = GetComponent<Rigidbody>().position;
+                _syncStartPosition = transform.position;
                 _syncEndPosition = syncPosition;
             }
         }
@@ -231,7 +231,7 @@ namespace Assets.Code
         void SyncedMovement()
         {
             _syncTime += Time.deltaTime;
-            GetComponent<Rigidbody>().position = Vector3.Lerp(_syncStartPosition, _syncEndPosition, _syncTime / _syncDelay);
+            transform.position = Vector3.Lerp(_syncStartPosition, _syncEndPosition, _syncTime / _syncDelay);
         }
     }
 }
